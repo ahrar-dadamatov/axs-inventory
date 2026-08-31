@@ -10,12 +10,15 @@ import { Ionicons } from '@expo/vector-icons';
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Branch = Database['public']['Tables']['branches']['Row'];
 
+const COMPANIES = ['AURA', 'GREENLIGHT'];
+
 export default function UsersScreen() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
   const [selectedRole, setSelectedRole] = useState<'employee' | 'boss'>('employee');
   const [modalVisible, setModalVisible] = useState(false);
   const { profile } = useAuth();
@@ -50,6 +53,7 @@ export default function UsersScreen() {
   const openManageModal = (user: Profile) => {
     setSelectedUser(user);
     setSelectedBranch(user.branch_id || '');
+    setSelectedCompany(user.company || '');
     setSelectedRole(user.role === 'admin' ? 'employee' : user.role); // just in case
     setModalVisible(true);
   };
@@ -64,7 +68,7 @@ export default function UsersScreen() {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ branch_id: selectedBranch, role: selectedRole, is_approved: true } as any)
+        .update({ branch_id: selectedBranch, role: selectedRole, company: selectedCompany, is_approved: true } as any)
         .eq('id', selectedUser.id);
 
       if (error) throw error;
@@ -97,6 +101,12 @@ export default function UsersScreen() {
             <View style={styles.row}>
               <Ionicons name="location" size={14} color="#818cf8" style={{marginRight: 4}} />
               <Text style={styles.branch}>{branchName}</Text>
+            </View>
+          )}
+          {item.company && (
+            <View style={styles.row}>
+              <Ionicons name="business" size={14} color={item.company === 'AURA' ? '#10b981' : '#3b82f6'} style={{marginRight: 4}} />
+              <Text style={[styles.branch, { color: item.company === 'AURA' ? '#34d399' : '#60a5fa' }]}>{item.company}</Text>
             </View>
           )}
         </View>
@@ -165,6 +175,25 @@ export default function UsersScreen() {
                   </TouchableOpacity>
                 ))}
               </ScrollView>
+
+              <Text style={styles.label}>Компания:</Text>
+              <View style={styles.pickerContainer}>
+                {COMPANIES.map(company => (
+                  <TouchableOpacity
+                    key={company}
+                    style={[
+                      styles.branchOption, 
+                      selectedCompany === company && styles.branchOptionSelected
+                    ]}
+                    onPress={() => setSelectedCompany(company)}
+                  >
+                    <Text style={[
+                      styles.branchOptionText,
+                      selectedCompany === company && styles.branchOptionTextSelected
+                    ]}>{company}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
 
               <Text style={styles.label}>Права доступа (Роль):</Text>
               <View style={styles.pickerContainer}>

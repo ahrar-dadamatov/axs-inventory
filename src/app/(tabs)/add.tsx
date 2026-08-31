@@ -20,6 +20,8 @@ const CATEGORIES = [
   'Другое'
 ];
 
+const COMPANIES = ['AURA', 'GREENLIGHT'];
+
 const STANDARD_ITEMS = [
   'Ноутбук',
   'Монитор',
@@ -61,6 +63,7 @@ export default function AddItemScreen() {
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState<{id: string, name: string}[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
   
   const [alertState, setAlertState] = useState({ visible: false, title: '', message: '', onSuccess: false });
   
@@ -81,6 +84,11 @@ export default function AddItemScreen() {
   useEffect(() => {
     if (profile?.branch_id && !selectedBranch) {
       setSelectedBranch(profile.branch_id);
+    }
+    if (profile?.company && !selectedCompany) {
+      setSelectedCompany(profile.company);
+    } else if (!profile?.company && !selectedCompany) {
+      setSelectedCompany(COMPANIES[0]);
     }
   }, [profile]);
 
@@ -184,6 +192,7 @@ export default function AddItemScreen() {
         usage_location: location,
         image_url: imageUrl,
         branch_id: selectedBranch,
+        company: selectedCompany,
         created_by: profile?.id,
         inventory_number: inventoryNumber.trim(),
       } as any));
@@ -199,6 +208,7 @@ export default function AddItemScreen() {
   };
 
   const canSelectBranch = profile?.role === 'admin' || profile?.role === 'boss';
+  const canSelectCompany = profile?.role === 'admin' || profile?.role === 'boss';
 
   return (
     <LinearGradient colors={['#0f172a', '#1e1b4b', '#0f172a']} style={styles.container}>
@@ -229,6 +239,16 @@ export default function AddItemScreen() {
               disabled={!canSelectBranch}
             />
             {!canSelectBranch && <Text style={styles.hintText}>Филиал привязан к вашему аккаунту</Text>}
+
+            <Text style={styles.label}>Компания</Text>
+            <CustomPicker
+              options={COMPANIES.map(comp => ({ label: comp, value: comp }))}
+              selectedValue={selectedCompany}
+              onValueChange={setSelectedCompany}
+              placeholder="Выберите компанию..."
+              disabled={!canSelectCompany}
+            />
+            {!canSelectCompany && <Text style={styles.hintText}>Компания привязана к вашему аккаунту</Text>}
 
             <Text style={styles.label}>Категория</Text>
             <CustomPicker

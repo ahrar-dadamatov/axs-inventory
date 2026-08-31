@@ -20,6 +20,7 @@ export default function InventoryListScreen() {
   const [search, setSearch] = useState('');
   const [filterBranch, setFilterBranch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const [filterCompany, setFilterCompany] = useState('');
 
   const { width } = useWindowDimensions();
   const isDesktop = width > 768;
@@ -71,6 +72,11 @@ export default function InventoryListScreen() {
     return Array.from(new Set(categories)).sort();
   }, [items]);
 
+  const uniqueCompanies = useMemo(() => {
+    const companies = items.map(i => i.company).filter(Boolean) as string[];
+    return Array.from(new Set(companies)).sort();
+  }, [items]);
+
   const filteredItems = items.filter(item => {
     const matchesSearch = search === '' || 
       item.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -80,8 +86,9 @@ export default function InventoryListScreen() {
       
     const matchesBranch = filterBranch === '' || item.branches?.name === filterBranch;
     const matchesCategory = filterCategory === '' || item.category === filterCategory;
+    const matchesCompany = filterCompany === '' || item.company === filterCompany;
 
-    return matchesSearch && matchesBranch && matchesCategory;
+    return matchesSearch && matchesBranch && matchesCategory && matchesCompany;
   });
 
   const renderItem = ({ item, index }: { item: Item, index: number }) => (
@@ -118,6 +125,11 @@ export default function InventoryListScreen() {
             {item.category && (
               <Text style={styles.categoryText}>
                 <Ionicons name="pricetag" size={12} /> {item.category}
+              </Text>
+            )}
+            {item.company && (
+              <Text style={[styles.categoryText, { color: item.company === 'AURA' ? '#34d399' : '#60a5fa' }]}>
+                <Ionicons name="business" size={12} /> {item.company}
               </Text>
             )}
             <Text style={styles.branchName}>
@@ -171,6 +183,19 @@ export default function InventoryListScreen() {
                 selectedValue={filterCategory}
                 onValueChange={setFilterCategory}
                 placeholder="Все категории..."
+              />
+            </View>
+          </View>
+          <View style={[styles.filtersContainer, { marginTop: 8 }]}>
+            <View style={styles.pickerWrapper}>
+              <CustomPicker
+                options={[
+                  { label: "Все компании", value: "" },
+                  ...uniqueCompanies.map(c => ({ label: c, value: c }))
+                ]}
+                selectedValue={filterCompany}
+                onValueChange={setFilterCompany}
+                placeholder="Все компании..."
               />
             </View>
           </View>

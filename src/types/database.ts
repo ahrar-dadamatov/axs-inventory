@@ -35,6 +35,7 @@ export interface Database {
           last_name: string | null
           role: 'admin' | 'employee' | 'boss'
           branch_id: string | null
+          company: string | null
           is_approved: boolean
           created_at: string
         }
@@ -46,6 +47,7 @@ export interface Database {
           last_name?: string | null
           role?: 'admin' | 'employee' | 'boss'
           branch_id?: string | null
+          company?: string | null
           is_approved?: boolean
           created_at?: string
         }
@@ -57,6 +59,7 @@ export interface Database {
           last_name?: string | null
           role?: 'admin' | 'employee' | 'boss'
           branch_id?: string | null
+          company?: string | null
           is_approved?: boolean
           created_at?: string
         }
@@ -72,6 +75,7 @@ export interface Database {
           branch_id: string
           created_by: string | null
           created_at: string
+          company: string | null
           inventory_number: string | null
         }
         Insert: {
@@ -84,6 +88,7 @@ export interface Database {
           branch_id: string
           created_by?: string | null
           created_at?: string
+          company?: string | null
           inventory_number?: string | null
         }
         Update: {
@@ -96,6 +101,7 @@ export interface Database {
           branch_id?: string
           created_by?: string | null
           created_at?: string
+          company?: string | null
           inventory_number?: string | null
         }
       }
