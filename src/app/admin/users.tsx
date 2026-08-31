@@ -157,7 +157,7 @@ export default function UsersScreen() {
               <Text style={styles.modalTitle}>Настройка доступа</Text>
               <Text style={styles.modalSubtitle}>Пользователь: {selectedUser?.username || selectedUser?.email.split('@')[0]}</Text>
               
-              <ScrollView style={{ maxHeight: '75%', marginVertical: 10 }} showsVerticalScrollIndicator={true}>
+              <ScrollView style={{ flexShrink: 1, marginVertical: 10 }} showsVerticalScrollIndicator={true}>
                 <Text style={styles.label}>Назначить в филиал:</Text>
                 <View style={styles.pickerContainer}>
                 {branches.map(branch => (
@@ -351,6 +351,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '90%',
+    maxHeight: '85%',
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
