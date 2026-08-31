@@ -324,6 +324,9 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 110,
     paddingBottom: 110,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
   },
   glassCard: {
     borderRadius: 24,

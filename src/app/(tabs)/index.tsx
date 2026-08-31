@@ -110,9 +110,10 @@ export default function DashboardScreen() {
             </TouchableOpacity>
             
             <Text style={styles.sectionTitle}>Недавно добавленные</Text>
-            {recentItems.length > 0 ? (
-              recentItems.map((item, index) => (
-                <BlurView key={item.id} intensity={15} tint="dark" style={styles.recentItemCard}>
+            <View style={styles.recentList}>
+              {recentItems.length > 0 ? (
+                recentItems.map((item, index) => (
+                  <BlurView key={item.id} intensity={15} tint="dark" style={styles.recentItemCard}>
                   <View style={styles.recentIconContainer}>
                     <Ionicons name="cube-outline" size={20} color="#818cf8" />
                   </View>
@@ -128,8 +129,9 @@ export default function DashboardScreen() {
             ) : (
               <BlurView intensity={10} tint="dark" style={styles.emptyRecent}>
                 <Text style={styles.emptyRecentText}>Пока ничего не добавлено</Text>
-              </BlurView>
-            )}
+                </BlurView>
+              )}
+            </View>
             
           </Animated.View>
           
@@ -147,6 +149,9 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 110,
     paddingBottom: 110,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   header: {
     marginBottom: 30,
@@ -235,12 +240,18 @@ const styles = StyleSheet.create({
     color: '#f8fafc',
     marginBottom: 16,
   },
+  recentList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
   recentItemCard: {
+    flex: 1,
+    minWidth: 300,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     borderRadius: 16,
-    marginBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
   },

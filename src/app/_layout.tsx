@@ -84,13 +84,5 @@ const styles = StyleSheet.create({
   webContainer: {
     flex: 1,
     backgroundColor: '#0f172a',
-    ...(Platform.OS === 'web' ? {
-      maxWidth: 800,
-      width: '100%',
-      marginHorizontal: 'auto',
-      borderLeftWidth: 1,
-      borderRightWidth: 1,
-      borderColor: 'rgba(255, 255, 255, 0.05)',
-    } : {})
   }
 });

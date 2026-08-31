@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, RefreshControl, TextInput, SafeAreaView, Animated } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, RefreshControl, TextInput, SafeAreaView, Animated, useWindowDimensions } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../types/database';
 import { useFocusEffect } from 'expo-router';
@@ -20,6 +20,10 @@ export default function InventoryListScreen() {
   const [search, setSearch] = useState('');
   const [filterBranch, setFilterBranch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+
+  const { width } = useWindowDimensions();
+  const isDesktop = width > 768;
+  const numCols = isDesktop ? 3 : 1;
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -81,10 +85,14 @@ export default function InventoryListScreen() {
   });
 
   const renderItem = ({ item, index }: { item: Item, index: number }) => (
-    <Animated.View style={[styles.cardContainer, { 
-      opacity: fadeAnim, 
-      transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20 + index * 5, 0] }) }] 
-    }]}>
+    <Animated.View style={[
+      styles.cardContainer, 
+      isDesktop && { flex: 1, margin: 8, minWidth: 300, maxWidth: '33.33%' },
+      { 
+        opacity: fadeAnim, 
+        transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20 + index * 5, 0] }) }] 
+      }
+    ]}>
       <BlurView intensity={20} tint="dark" style={styles.card}>
         {item.image_url ? (
           <Image source={{ uri: item.image_url }} style={styles.image} />
@@ -173,18 +181,22 @@ export default function InventoryListScreen() {
             <ActivityIndicator size="large" color="#818cf8" />
           </View>
         ) : (
-          <FlatList
-            data={filteredItems}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={styles.list}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#818cf8" />}
-            ListEmptyComponent={
-              <View style={styles.center}>
-                <Text style={styles.emptyText}>Ничего не найдено</Text>
-              </View>
-            }
-          />
+          <View style={styles.listWrapper}>
+            <FlatList
+              key={numCols}
+              numColumns={numCols}
+              data={filteredItems}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={styles.list}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#818cf8" />}
+              ListEmptyComponent={
+                <View style={styles.center}>
+                  <Text style={styles.emptyText}>Ничего не найдено</Text>
+                </View>
+              }
+            />
+          </View>
         )}
       </SafeAreaView>
     </LinearGradient>
@@ -232,6 +244,12 @@ const styles = StyleSheet.create({
   },
   pickerWrapper: {
     flex: 1,
+  },
+  listWrapper: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   list: {
     padding: 16,
