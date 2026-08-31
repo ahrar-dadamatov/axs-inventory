@@ -157,8 +157,9 @@ export default function UsersScreen() {
               <Text style={styles.modalTitle}>Настройка доступа</Text>
               <Text style={styles.modalSubtitle}>Пользователь: {selectedUser?.username || selectedUser?.email.split('@')[0]}</Text>
               
-              <Text style={styles.label}>Назначить в филиал:</Text>
-              <ScrollView style={styles.pickerContainer}>
+              <ScrollView style={{ maxHeight: '75%', marginVertical: 10 }} showsVerticalScrollIndicator={true}>
+                <Text style={styles.label}>Назначить в филиал:</Text>
+                <View style={styles.pickerContainer}>
                 {branches.map(branch => (
                   <TouchableOpacity
                     key={branch.id}
@@ -174,9 +175,9 @@ export default function UsersScreen() {
                     ]}>{branch.name}</Text>
                   </TouchableOpacity>
                 ))}
-              </ScrollView>
+                </View>
 
-              <Text style={styles.label}>Компания:</Text>
+                <Text style={styles.label}>Компания:</Text>
               <View style={styles.pickerContainer}>
                 {COMPANIES.map(company => (
                   <TouchableOpacity
@@ -215,6 +216,7 @@ export default function UsersScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
+              </ScrollView>
 
               <View style={styles.modalButtons}>
                 <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setModalVisible(false)}>
@@ -375,7 +377,6 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     marginBottom: 24,
-    maxHeight: 250,
   },
   branchOption: {
     padding: 14,
