@@ -21,7 +21,12 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "display": "standalone",
+      "name": "AXS Инвентарь",
+      "shortName": "Инвентарь",
+      "themeColor": "#0f172a",
+      "backgroundColor": "#0f172a"
     },
     "plugins": [
       "expo-router",
