@@ -4,8 +4,8 @@ import 'react-native-url-polyfill/auto';
 import { Database } from '../types/database';
 
 // TODO: Замените на ваши данные из Supabase Project Settings -> API
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://rhdkfclugyhpwqnpqypf.supabase.co';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_gU87zZl5f8OMROSMt_r_ng_4gIOBB3B';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://fatqhgpocgfkjjaukavy.supabase.co';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable__iJdzo57pxKPQH56aqjMtA_qOIBRcf5';
 
 import { Platform } from 'react-native';
 
