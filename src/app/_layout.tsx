@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View, StyleSheet, Platform } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
@@ -72,8 +72,25 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
-        <RootLayoutNav />
+        <View style={styles.webContainer}>
+          <RootLayoutNav />
+        </View>
       </AuthProvider>
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  webContainer: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+    ...(Platform.OS === 'web' ? {
+      maxWidth: 800,
+      width: '100%',
+      marginHorizontal: 'auto',
+      borderLeftWidth: 1,
+      borderRightWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.05)',
+    } : {})
+  }
+});
