@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { decode } from 'base64-arraybuffer';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -58,6 +59,8 @@ export default function AddItemScreen() {
   const [inventoryNumber, setInventoryNumber] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
+  const [image2, setImage2] = useState<string | null>(null);
+  const [base64Image2, setBase64Image2] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState<{ id: string, name: string }[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
@@ -112,7 +115,7 @@ export default function AddItemScreen() {
     }
   };
 
-  const pickImage = async () => {
+  const pickImage = async (index: number) => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       showAlert('Внимание', 'Нужно разрешение на использование камеры');
@@ -122,14 +125,25 @@ export default function AddItemScreen() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ['images'],
       allowsEditing: false,
-      quality: 0.4,
-      maxWidth: 800,
+      quality: 1, // original quality from picker
       base64: true,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setBase64Image(result.assets[0].base64 || null);
+      // Compress manually using manipulator
+      const manipResult = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 600 } }],
+        { compress: 0.2, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+      );
+
+      if (index === 1) {
+        setImage(manipResult.uri);
+        setBase64Image(manipResult.base64 || null);
+      } else {
+        setImage2(manipResult.uri);
+        setBase64Image2(manipResult.base64 || null);
+      }
     }
   };
 
@@ -158,6 +172,7 @@ export default function AddItemScreen() {
 
     setLoading(true);
     let imageUrl = null;
+    let imageUrl2 = null;
 
     try {
       if (base64Image) {
@@ -177,12 +192,30 @@ export default function AddItemScreen() {
         imageUrl = publicUrl;
       }
 
+      if (base64Image2) {
+        const filePath2 = `${selectedBranch}/${Date.now()}_2.jpg`;
+        const { error: uploadError2 } = await supabase.storage
+          .from('inventory_images')
+          .upload(filePath2, decode(base64Image2), {
+            contentType: 'image/jpeg',
+          });
+
+        if (uploadError2) throw uploadError2;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('inventory_images')
+          .getPublicUrl(filePath2);
+          
+        imageUrl2 = publicUrl;
+      }
+
       const { error: insertError } = await (supabase.from('inventory_items').insert({
         name: finalName,
         category: selectedCategory,
         quantity: parseInt(quantity, 10) || 1,
         usage_location: location,
         image_url: imageUrl,
+        image_url_2: imageUrl2,
         branch_id: selectedBranch,
         created_by: profile?.id,
         inventory_number: inventoryNumber.trim(),
@@ -206,17 +239,30 @@ export default function AddItemScreen() {
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }}>
 
           <BlurView intensity={20} tint="dark" style={styles.glassCard}>
-            <Text style={styles.sectionTitle}>Фотография</Text>
-            <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-              {image ? (
-                <Image source={{ uri: image }} style={styles.image} />
-              ) : (
-                <View style={styles.placeholder}>
-                  <Ionicons name="camera" size={44} color="#818cf8" style={{ marginBottom: 12, opacity: 0.9 }} />
-                  <Text style={styles.placeholderText}>Нажмите чтобы добавить фото</Text>
-                </View>
-              )}
-            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>Фотографии</Text>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity style={[styles.imagePicker, { flex: 1 }]} onPress={() => pickImage(1)}>
+                {image ? (
+                  <Image source={{ uri: image }} style={styles.image} />
+                ) : (
+                  <View style={styles.placeholder}>
+                    <Ionicons name="camera" size={32} color="#818cf8" style={{ marginBottom: 8, opacity: 0.9 }} />
+                    <Text style={[styles.placeholderText, { fontSize: 13, textAlign: 'center' }]}>Общий вид</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity style={[styles.imagePicker, { flex: 1 }]} onPress={() => pickImage(2)}>
+                {image2 ? (
+                  <Image source={{ uri: image2 }} style={styles.image} />
+                ) : (
+                  <View style={styles.placeholder}>
+                    <Ionicons name="barcode-outline" size={32} color="#818cf8" style={{ marginBottom: 8, opacity: 0.9 }} />
+                    <Text style={[styles.placeholderText, { fontSize: 13, textAlign: 'center' }]}>Штрихкод (доп.)</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
           </BlurView>
 
           <BlurView intensity={20} tint="dark" style={styles.glassCard}>
@@ -368,7 +414,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   imagePicker: {
-    height: 220,
+    height: 160,
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: 16,
     overflow: 'hidden',
