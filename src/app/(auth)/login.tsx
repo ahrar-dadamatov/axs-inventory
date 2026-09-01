@@ -43,7 +43,7 @@ export default function LoginScreen() {
   const autoGenerateUsername = (first: string, last: string) => {
     const f = first.trim().toLowerCase();
     const l = last.trim().toLowerCase();
-    if (f && l) return `${f}_${l}`;
+    if (f && l) return `${f}.${l[0]}`;
     if (f) return f;
     return l;
   };
