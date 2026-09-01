@@ -144,11 +144,13 @@ export default function LoginScreen() {
           style={styles.keyboardView}
         >
           <View style={styles.logoContainer}>
-            <Image 
-              source={require('../../../assets/images/logo.jpg')}
-              style={styles.logoImage}
-              resizeMode="cover"
-            />
+            <View style={styles.logoShadow}>
+              <Image 
+                source={require('../../../assets/images/logo.jpg')}
+                style={styles.logoImage}
+                resizeMode="cover"
+              />
+            </View>
             <Text style={styles.title}>AXS Инвентарь</Text>
             <Text style={styles.subtitle}>Система учета имущества</Text>
           </View>
@@ -305,15 +307,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  logoImage: {
-    width: 140,
-    height: 140,
-    borderRadius: 35,
+  logoShadow: {
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
+    elevation: 10,
+    borderRadius: 35,
+    backgroundColor: '#0f172a',
+  },
+  logoImage: {
+    width: 140,
+    height: 140,
+    borderRadius: 35,
+    overflow: 'hidden',
   },
   title: {
     fontSize: 32,
