@@ -1,10 +1,36 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 
 export default function PendingScreen() {
+  const [adminUsername, setAdminUsername] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, email')
+          .eq('role', 'admin')
+          .limit(1)
+          .single();
+        
+        if (data) {
+          setAdminUsername(data.username || data.email.split('@')[0]);
+        }
+      } catch (err) {
+        console.error('Error fetching admin:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAdmin();
+  }, []);
+
   return (
     <LinearGradient colors={['#0f172a', '#1e1b4b', '#0f172a']} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -17,9 +43,16 @@ export default function PendingScreen() {
             <Text style={styles.text}>
               Ваш аккаунт успешно зарегистрирован, но администратор еще не выдал вам доступ к филиалу.
             </Text>
-            <Text style={styles.textHighlight}>
-              Пожалуйста, подождите или свяжитесь с администратором.
-            </Text>
+            <View style={styles.adminBox}>
+              {loading ? (
+                <ActivityIndicator color="#818cf8" size="small" />
+              ) : (
+                <Text style={styles.textHighlight}>
+                  Запрос на доступ отправлен администратору: {'\n'}
+                  <Text style={styles.adminName}>@{adminUsername || 'admin'}</Text>
+                </Text>
+              )}
+            </View>
             
             <TouchableOpacity 
               style={styles.button}
@@ -78,12 +111,29 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     lineHeight: 24,
   },
-  textHighlight: {
-    fontSize: 15,
-    textAlign: 'center',
+  adminBox: {
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
     marginBottom: 30,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 80,
+  },
+  textHighlight: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#cbd5e1',
+    lineHeight: 22,
+  },
+  adminName: {
+    fontSize: 18,
     color: '#818cf8',
-    fontWeight: '600',
+    fontWeight: '800',
+    marginTop: 4,
   },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
