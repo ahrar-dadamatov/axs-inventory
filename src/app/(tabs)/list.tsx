@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, RefreshControl, TextInput, SafeAreaView, Animated, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, RefreshControl, TextInput, SafeAreaView, Animated, useWindowDimensions, ScrollView } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../types/database';
 import { useFocusEffect } from 'expo-router';
