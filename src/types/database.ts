@@ -72,6 +72,7 @@ export interface Database {
           quantity: number
           usage_location: string | null
           image_url: string | null
+          image_url_2: string | null
           branch_id: string
           created_by: string | null
           created_at: string
@@ -85,6 +86,7 @@ export interface Database {
           quantity?: number
           usage_location?: string | null
           image_url?: string | null
+          image_url_2?: string | null
           branch_id: string
           created_by?: string | null
           created_at?: string
@@ -98,6 +100,7 @@ export interface Database {
           quantity?: number
           usage_location?: string | null
           image_url?: string | null
+          image_url_2?: string | null
           branch_id?: string
           created_by?: string | null
           created_at?: string

@@ -101,13 +101,26 @@ export default function InventoryListScreen() {
       }
     ]}>
       <BlurView intensity={20} tint="dark" style={styles.card}>
-        {item.image_url ? (
-          <Image source={{ uri: item.image_url }} style={styles.image} />
-        ) : (
-          <View style={styles.noImage}>
-            <Text style={styles.noImageText}>Нет фото</Text>
-          </View>
-        )}
+        <View style={{ width: 120, borderRightWidth: 1, borderRightColor: 'rgba(255,255,255,0.05)' }}>
+          <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
+            {item.image_url ? (
+              <Image source={{ uri: item.image_url }} style={styles.image} />
+            ) : (
+              <View style={styles.noImage}>
+                <Text style={styles.noImageText}>Нет фото</Text>
+              </View>
+            )}
+            {item.image_url_2 && (
+              <Image source={{ uri: item.image_url_2 }} style={styles.image} />
+            )}
+          </ScrollView>
+          {item.image_url_2 && (
+            <View style={styles.multipleImagesBadge}>
+              <Ionicons name="images" size={10} color="#fff" style={{marginRight: 2}} />
+              <Text style={{ color: '#fff', fontSize: 10, fontWeight: '700' }}>2</Text>
+            </View>
+          )}
+        </View>
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
             <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
@@ -297,14 +310,23 @@ const styles = StyleSheet.create({
     minHeight: 130,
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
+  multipleImagesBadge: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   noImage: {
     width: 120,
     minHeight: 130,
     backgroundColor: 'rgba(255,255,255,0.02)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRightWidth: 1,
-    borderRightColor: 'rgba(255,255,255,0.05)',
   },
   noImageText: {
     color: '#64748b',

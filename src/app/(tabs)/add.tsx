@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { decode } from 'base64-arraybuffer';
+import { BlurView } from 'expo-blur';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import CustomAlert from '../../components/CustomAlert';
+import CustomPicker from '../../components/CustomPicker';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../providers/AuthProvider';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
-import CustomPicker from '../../components/CustomPicker';
-import CustomAlert from '../../components/CustomAlert';
 
 const CATEGORIES = [
   'Электроника',
@@ -19,8 +19,6 @@ const CATEGORIES = [
   'Расходные материалы',
   'Другое'
 ];
-
-const COMPANIES = ['AURA', 'GREENLIGHT'];
 
 const STANDARD_ITEMS = [
   'Ноутбук',
@@ -54,19 +52,18 @@ export default function AddItemScreen() {
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
   const [selectedItemType, setSelectedItemType] = useState(STANDARD_ITEMS[0]);
   const [customName, setCustomName] = useState('');
-  
+
   const [quantity, setQuantity] = useState('1');
   const [location, setLocation] = useState('');
   const [inventoryNumber, setInventoryNumber] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [branches, setBranches] = useState<{id: string, name: string}[]>([]);
+  const [branches, setBranches] = useState<{ id: string, name: string }[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
-  const [selectedCompany, setSelectedCompany] = useState<string>('');
-  
+
   const [alertState, setAlertState] = useState({ visible: false, title: '', message: '', onSuccess: false });
-  
+
   const { profile } = useAuth();
   const router = useRouter();
 
@@ -84,11 +81,6 @@ export default function AddItemScreen() {
   useEffect(() => {
     if (profile?.branch_id && !selectedBranch) {
       setSelectedBranch(profile.branch_id);
-    }
-    if (profile?.company && !selectedCompany) {
-      setSelectedCompany(profile.company);
-    } else if (!profile?.company && !selectedCompany) {
-      setSelectedCompany(COMPANIES[0]);
     }
   }, [profile]);
 
@@ -148,7 +140,7 @@ export default function AddItemScreen() {
     }
 
     const finalName = selectedItemType === 'Другое...' ? customName : selectedItemType;
-    
+
     if (!finalName.trim()) {
       showAlert('Ошибка', 'Введите название предмета');
       return;
@@ -181,7 +173,7 @@ export default function AddItemScreen() {
         const { data: { publicUrl } } = supabase.storage
           .from('inventory_images')
           .getPublicUrl(filePath);
-          
+
         imageUrl = publicUrl;
       }
 
@@ -192,7 +184,6 @@ export default function AddItemScreen() {
         usage_location: location,
         image_url: imageUrl,
         branch_id: selectedBranch,
-        company: selectedCompany,
         created_by: profile?.id,
         inventory_number: inventoryNumber.trim(),
       } as any));
@@ -208,13 +199,12 @@ export default function AddItemScreen() {
   };
 
   const canSelectBranch = profile?.role === 'admin' || profile?.role === 'boss';
-  const canSelectCompany = profile?.role === 'admin' || profile?.role === 'boss';
 
   return (
     <LinearGradient colors={['#0f172a', '#1e1b4b', '#0f172a']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }}>
-          
+
           <BlurView intensity={20} tint="dark" style={styles.glassCard}>
             <Text style={styles.sectionTitle}>Фотография</Text>
             <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
@@ -222,7 +212,7 @@ export default function AddItemScreen() {
                 <Image source={{ uri: image }} style={styles.image} />
               ) : (
                 <View style={styles.placeholder}>
-                  <Ionicons name="camera" size={44} color="#818cf8" style={{marginBottom: 12, opacity: 0.9}} />
+                  <Ionicons name="camera" size={44} color="#818cf8" style={{ marginBottom: 12, opacity: 0.9 }} />
                   <Text style={styles.placeholderText}>Нажмите чтобы добавить фото</Text>
                 </View>
               )}
@@ -239,16 +229,6 @@ export default function AddItemScreen() {
               disabled={!canSelectBranch}
             />
             {!canSelectBranch && <Text style={styles.hintText}>Филиал привязан к вашему аккаунту</Text>}
-
-            <Text style={styles.label}>Компания</Text>
-            <CustomPicker
-              options={COMPANIES.map(comp => ({ label: comp, value: comp }))}
-              selectedValue={selectedCompany}
-              onValueChange={setSelectedCompany}
-              placeholder="Выберите компанию..."
-              disabled={!canSelectCompany}
-            />
-            {!canSelectCompany && <Text style={styles.hintText}>Компания привязана к вашему аккаунту</Text>}
 
             <Text style={styles.label}>Категория</Text>
             <CustomPicker
@@ -305,8 +285,8 @@ export default function AddItemScreen() {
             />
           </BlurView>
 
-          <TouchableOpacity 
-            style={[styles.button, loading && styles.buttonDisabled]} 
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleSave}
             disabled={loading}
           >
@@ -326,11 +306,11 @@ export default function AddItemScreen() {
         </Animated.View>
       </ScrollView>
 
-      <CustomAlert 
-        visible={alertState.visible} 
-        title={alertState.title} 
-        message={alertState.message} 
-        onClose={hideAlert} 
+      <CustomAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        onClose={hideAlert}
       />
     </LinearGradient>
   );
