@@ -219,6 +219,7 @@ export default function AddItemScreen() {
         branch_id: selectedBranch,
         created_by: profile?.id,
         inventory_number: inventoryNumber.trim(),
+        company: profile?.company,
       } as any));
 
       if (insertError) throw insertError;
