@@ -43,7 +43,6 @@ const getCityPrefix = (cityName: string) => {
 };
 
 export default function AddItemScreen() {
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
   const [selectedItemType, setSelectedItemType] = useState(STANDARD_ITEMS[0]);
   const [customName, setCustomName] = useState('');
 

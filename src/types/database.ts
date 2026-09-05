@@ -13,16 +13,59 @@ export interface Database {
         Row: {
           id: string
           name: string
+          code?: string | null
           created_at: string
         }
         Insert: {
           id?: string
           name: string
+          code?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           name?: string
+          code?: string | null
+          created_at?: string
+        }
+      }
+      companies: {
+        Row: {
+          id: string
+          name: string
+          code: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          code: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          code?: string
+          created_at?: string
+        }
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          code: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          code: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          code?: string
           created_at?: string
         }
       }
@@ -74,6 +117,8 @@ export interface Database {
           image_url: string | null
           image_url_2: string | null
           branch_id: string
+          company_id: string | null
+          category_id: string | null
           created_by: string | null
           created_at: string
           company: string | null
@@ -88,6 +133,8 @@ export interface Database {
           image_url?: string | null
           image_url_2?: string | null
           branch_id: string
+          company_id?: string | null
+          category_id?: string | null
           created_by?: string | null
           created_at?: string
           company?: string | null
@@ -102,6 +149,8 @@ export interface Database {
           image_url?: string | null
           image_url_2?: string | null
           branch_id?: string
+          company_id?: string | null
+          category_id?: string | null
           created_by?: string | null
           created_at?: string
           company?: string | null
