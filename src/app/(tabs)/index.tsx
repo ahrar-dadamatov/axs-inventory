@@ -8,7 +8,9 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { Database } from '../../types/database';
 
-type Item = Database['public']['Tables']['inventory_items']['Row'];
+type Item = Database['public']['Tables']['inventory_items']['Row'] & {
+  categories?: { name: string } | null;
+};
 
 export default function DashboardScreen() {
   const { profile } = useAuth();
@@ -32,8 +34,8 @@ export default function DashboardScreen() {
   }, [profile]);
 
   const fetchStats = async () => {
-    let query = supabase.from('inventory_items').select('*', { count: 'exact' }) as any;
-    let recentQuery = supabase.from('inventory_items').select('*').order('created_at', { ascending: false }).limit(3) as any;
+    let query = supabase.from('inventory_items').select('*, categories(name)', { count: 'exact' }) as any;
+    let recentQuery = supabase.from('inventory_items').select('*, categories(name)').order('created_at', { ascending: false }).limit(3) as any;
       
     if (profile?.role !== 'admin' && profile?.role !== 'boss') {
       if (profile?.branch_id) {
@@ -48,7 +50,7 @@ export default function DashboardScreen() {
       
     const { data, count } = await query;
     if (data && count !== null) {
-      const uniqueCats = new Set(data.map(i => i.category).filter(Boolean));
+      const uniqueCats = new Set(data.map(i => i.categories?.name).filter(Boolean));
       setStats({ total: count, categories: uniqueCats.size });
     }
     
@@ -119,7 +121,7 @@ export default function DashboardScreen() {
                   </View>
                   <View style={styles.recentInfo}>
                     <Text style={styles.recentName}>{item.name}</Text>
-                    <Text style={styles.recentCategory}>{item.category || 'Без категории'}</Text>
+                    <Text style={styles.recentCategory}>{item.categories?.name || 'Без категории'}</Text>
                   </View>
                   <View style={styles.recentQuantityBadge}>
                     <Text style={styles.recentQuantity}>{item.quantity} шт</Text>

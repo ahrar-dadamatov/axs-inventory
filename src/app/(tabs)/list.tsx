@@ -10,6 +10,8 @@ import CustomPicker from '../../components/CustomPicker';
 
 type Item = Database['public']['Tables']['inventory_items']['Row'] & {
   branches?: { name: string } | null;
+  categories?: { name: string } | null;
+  companies?: { name: string } | null;
 };
 
 export default function InventoryListScreen() {
@@ -32,7 +34,7 @@ export default function InventoryListScreen() {
     try {
       const { data, error } = await supabase
         .from('inventory_items')
-        .select('*, branches(name)')
+        .select('*, branches(name), categories(name), companies(name)')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -68,12 +70,12 @@ export default function InventoryListScreen() {
   }, [items]);
 
   const uniqueCategories = useMemo(() => {
-    const categories = items.map(i => i.category).filter(Boolean) as string[];
+    const categories = items.map(i => i.categories?.name).filter(Boolean) as string[];
     return Array.from(new Set(categories)).sort();
   }, [items]);
 
   const uniqueCompanies = useMemo(() => {
-    const companies = items.map(i => i.company).filter(Boolean) as string[];
+    const companies = items.map(i => i.companies?.name).filter(Boolean) as string[];
     return Array.from(new Set(companies)).sort();
   }, [items]);
 
@@ -85,8 +87,8 @@ export default function InventoryListScreen() {
       (item.branches?.name && item.branches.name.toLowerCase().includes(search.toLowerCase()));
       
     const matchesBranch = filterBranch === '' || item.branches?.name === filterBranch;
-    const matchesCategory = filterCategory === '' || item.category === filterCategory;
-    const matchesCompany = filterCompany === '' || item.company === filterCompany;
+    const matchesCategory = filterCategory === '' || item.categories?.name === filterCategory;
+    const matchesCompany = filterCompany === '' || item.companies?.name === filterCompany;
 
     return matchesSearch && matchesBranch && matchesCategory && matchesCompany;
   });
@@ -135,14 +137,14 @@ export default function InventoryListScreen() {
                 <Ionicons name="barcode-outline" size={12} /> {item.inventory_number}
               </Text>
             )}
-            {item.category && (
+            {item.categories?.name && (
               <Text style={styles.categoryText}>
-                <Ionicons name="pricetag" size={12} /> {item.category}
+                <Ionicons name="pricetag" size={12} /> {item.categories.name}
               </Text>
             )}
-            {item.company && (
-              <Text style={[styles.categoryText, { color: item.company === 'AURA' ? '#34d399' : '#60a5fa' }]}>
-                <Ionicons name="business" size={12} /> {item.company}
+            {item.companies?.name && (
+              <Text style={[styles.categoryText, { color: item.companies.name === 'AURA' ? '#34d399' : '#60a5fa' }]}>
+                <Ionicons name="business" size={12} /> {item.companies.name}
               </Text>
             )}
             <Text style={styles.branchName}>

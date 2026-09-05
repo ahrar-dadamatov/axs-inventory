@@ -12,14 +12,7 @@ import CustomPicker from '../../components/CustomPicker';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../providers/AuthProvider';
 
-const CATEGORIES = [
-  'Электроника',
-  'Оргтехника',
-  'Мебель',
-  'Канцелярия',
-  'Расходные материалы',
-  'Другое'
-];
+// Категории и Компании теперь будут загружаться из базы данных
 
 const STANDARD_ITEMS = [
   'Ноутбук',
@@ -56,14 +49,19 @@ export default function AddItemScreen() {
 
   const [quantity, setQuantity] = useState('1');
   const [location, setLocation] = useState('');
-  const [inventoryNumber, setInventoryNumber] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [image2, setImage2] = useState<string | null>(null);
   const [base64Image2, setBase64Image2] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [branches, setBranches] = useState<{ id: string, name: string }[]>([]);
+  const [branches, setBranches] = useState<{ id: string, name: string, code: string }[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
+  
+  const [companies, setCompanies] = useState<{ id: string, name: string, code: string }[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
+  
+  const [categories, setCategories] = useState<{ id: string, name: string, code: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   const [alertState, setAlertState] = useState({ visible: false, title: '', message: '', onSuccess: false });
 
@@ -87,19 +85,20 @@ export default function AddItemScreen() {
     }
   }, [profile]);
 
-  useEffect(() => {
-    if (selectedBranch && branches.length > 0) {
-      const branchName = branches.find(b => b.id === selectedBranch)?.name;
-      if (branchName) {
-        setInventoryNumber(getCityPrefix(branchName));
-      }
-    }
-  }, [selectedBranch, branches]);
-
   const fetchBranches = async () => {
-    const { data, error } = await supabase.from('branches').select('*');
-    if (!error && data) {
-      setBranches(data);
+    const { data: branchData } = await supabase.from('branches').select('*');
+    if (branchData) setBranches(branchData);
+    
+    const { data: compData } = await supabase.from('companies').select('*');
+    if (compData) {
+      setCompanies(compData);
+      if (compData.length > 0) setSelectedCompany(compData[0].id);
+    }
+    
+    const { data: catData } = await supabase.from('categories').select('*');
+    if (catData) {
+      setCategories(catData);
+      if (catData.length > 0) setSelectedCategory(catData[0].id);
     }
   };
 
@@ -163,10 +162,12 @@ export default function AddItemScreen() {
       showAlert('Ошибка', 'Выберите филиал');
       return;
     }
-
-    const prefix = getCityPrefix(branches.find(b => b.id === selectedBranch)?.name || '');
-    if (!inventoryNumber.trim() || inventoryNumber.trim() === prefix) {
-      showAlert('Ошибка', 'Введите инвентарный номер (ID)');
+    if (!selectedCompany) {
+      showAlert('Ошибка', 'Выберите компанию');
+      return;
+    }
+    if (!selectedCategory) {
+      showAlert('Ошибка', 'Выберите категорию');
       return;
     }
 
@@ -209,22 +210,26 @@ export default function AddItemScreen() {
         imageUrl2 = publicUrl;
       }
 
-      const { error: insertError } = await (supabase.from('inventory_items').insert({
+      const { data: insertedItem, error: insertError } = await (supabase.from('inventory_items').insert({
         name: finalName,
-        category: selectedCategory,
         quantity: parseInt(quantity, 10) || 1,
         usage_location: location,
         image_url: imageUrl,
         image_url_2: imageUrl2,
         branch_id: selectedBranch,
+        company_id: selectedCompany,
+        category_id: selectedCategory,
         created_by: profile?.id,
-        inventory_number: inventoryNumber.trim(),
-        company: profile?.company,
-      } as any));
+        // inventory_number генерируется триггером БД
+      } as any).select().single());
 
       if (insertError) throw insertError;
 
-      showAlert('Успех', 'Инвентарь добавлен!', true);
+      showAlert(
+        'Успех', 
+        `Инвентарь добавлен!\nПрисвоен номер: ${insertedItem?.inventory_number || 'Ожидание синхронизации'}\nПожалуйста, напишите этот номер на товаре.`, 
+        true
+      );
     } catch (error: any) {
       showAlert('Ошибка', error.message);
     } finally {
@@ -277,21 +282,20 @@ export default function AddItemScreen() {
             />
             {!canSelectBranch && <Text style={styles.hintText}>Филиал привязан к вашему аккаунту</Text>}
 
-            <Text style={styles.label}>Категория</Text>
+            <Text style={styles.label}>Компания</Text>
             <CustomPicker
-              options={CATEGORIES.map(cat => ({ label: cat, value: cat }))}
-              selectedValue={selectedCategory}
-              onValueChange={setSelectedCategory}
-              placeholder="Категория"
+              options={companies.map(c => ({ label: `${c.name} (${c.code})`, value: c.id }))}
+              selectedValue={selectedCompany}
+              onValueChange={setSelectedCompany}
+              placeholder="Выберите компанию..."
             />
 
-            <Text style={styles.label}>Инвентарный номер (ID)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Например: ALM-001"
-              placeholderTextColor="#64748b"
-              value={inventoryNumber}
-              onChangeText={setInventoryNumber}
+            <Text style={styles.label}>Категория</Text>
+            <CustomPicker
+              options={categories.map(cat => ({ label: `${cat.name} (${cat.code})`, value: cat.id }))}
+              selectedValue={selectedCategory}
+              onValueChange={setSelectedCategory}
+              placeholder="Выберите категорию..."
             />
 
             <Text style={styles.label}>Название товара</Text>
