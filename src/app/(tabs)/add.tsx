@@ -14,53 +14,31 @@ import { useAuth } from '../../providers/AuthProvider';
 
 // Категории и Компании теперь будут загружаться из базы данных
 
-const STANDARD_ITEMS = [
-  // Компьютерная техника и периферия
-  'Ноутбук',
-  'Монитор',
-  'Системный блок',
-  'Моноблок',
-  'Планшет',
-  'Клавиатура',
-  'Мышка',
-  'Веб-камера',
-  'Гарнитура (наушники)',
-  
-  // Оргтехника и сеть
-  'Принтер / МФУ',
-  'Сканер',
-  'Шредер (уничтожитель бумаг)',
-  'Проектор',
-  'Роутер / Маршрутизатор',
-  'Коммутатор (Switch)',
-  'IP-телефон',
-  
-  // Мебель
-  'Кресло офисное',
-  'Стул для посетителей',
-  'Стол рабочий',
-  'Стол переговорный',
-  'Стеллаж',
-  'Тумба',
-  'Шкаф для документов',
-  'Диван офисный',
-  'Журнальный столик',
-  
-  // Бытовая и климатическая техника
-  'Кондиционер',
-  'Кулер для воды',
-  'Холодильник',
-  'Микроволновая печь',
-  'Кофемашина',
-  'Чайник электрический',
-  'Обогреватель',
-  
-  // Прочее
-  'Сейф',
-  'Маркерная доска',
-  'Огнетушитель',
-  'Другое...'
-];
+const ITEMS_BY_CATEGORY: Record<string, string[]> = {
+  'Компьютерная техника': [
+    'Ноутбук', 'Монитор', 'Системный блок', 'Моноблок', 'Планшет',
+    'Клавиатура', 'Мышка', 'Веб-камера', 'Гарнитура (наушники)'
+  ],
+  'Оргтехника': [
+    'Принтер / МФУ', 'Сканер', 'Шредер (уничтожитель бумаг)', 'Проектор'
+  ],
+  'Сетевое оборудование': [
+    'Роутер / Маршрутизатор', 'Коммутатор (Switch)', 'IP-телефон', 'Сервер'
+  ],
+  'Мебель': [
+    'Кресло офисное', 'Стул для посетителей', 'Стол рабочий', 'Стол переговорный',
+    'Стеллаж', 'Тумба', 'Шкаф для документов', 'Диван офисный', 'Журнальный столик'
+  ],
+  'Бытовая техника': [
+    'Кондиционер', 'Кулер для воды', 'Холодильник', 'Микроволновая печь', 'Кофемашина', 'Чайник электрический'
+  ],
+  'Климатическое оборудование': [
+    'Кондиционер', 'Обогреватель', 'Вентилятор'
+  ],
+  'Прочее': [
+    'Сейф', 'Маркерная доска', 'Огнетушитель'
+  ]
+};
 
 const getCityPrefix = (cityName: string) => {
   const map: Record<string, string> = {
@@ -77,7 +55,7 @@ const getCityPrefix = (cityName: string) => {
 };
 
 export default function AddItemScreen() {
-  const [selectedItemType, setSelectedItemType] = useState(STANDARD_ITEMS[0]);
+  const [selectedItemType, setSelectedItemType] = useState('Другое...');
   const [customName, setCustomName] = useState('');
 
   const [quantity, setQuantity] = useState('1');
@@ -102,6 +80,19 @@ export default function AddItemScreen() {
   const router = useRouter();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // Динамический список товаров в зависимости от выбранной категории
+  const selectedCategoryName = categories.find(c => c.id === selectedCategory)?.name || '';
+  const availableItems = selectedCategoryName && ITEMS_BY_CATEGORY[selectedCategoryName] 
+    ? [...ITEMS_BY_CATEGORY[selectedCategoryName], 'Другое...']
+    : ['Другое...'];
+
+  useEffect(() => {
+    // Сбрасываем выбранный товар при смене категории, если его нет в новом списке
+    if (availableItems.length > 0 && !availableItems.includes(selectedItemType)) {
+      setSelectedItemType(availableItems[0]);
+    }
+  }, [selectedCategory, categories]);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -333,7 +324,7 @@ export default function AddItemScreen() {
 
             <Text style={styles.label}>Название товара</Text>
             <CustomPicker
-              options={STANDARD_ITEMS.map(item => ({ label: item, value: item }))}
+              options={availableItems.map(item => ({ label: item, value: item }))}
               selectedValue={selectedItemType}
               onValueChange={setSelectedItemType}
               placeholder="Название"
