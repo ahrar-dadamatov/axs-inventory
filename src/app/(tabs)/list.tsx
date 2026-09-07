@@ -176,7 +176,7 @@ export default function InventoryListScreen() {
             />
           </View>
           
-          <View style={styles.filtersContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll} contentContainerStyle={styles.filtersScrollContent}>
             <View style={styles.pickerWrapper}>
               <CustomPicker
                 options={[
@@ -200,8 +200,7 @@ export default function InventoryListScreen() {
                 placeholder="Все категории..."
               />
             </View>
-          </View>
-          <View style={[styles.filtersContainer, { marginTop: 8 }]}>
+
             <View style={styles.pickerWrapper}>
               <CustomPicker
                 options={[
@@ -213,7 +212,7 @@ export default function InventoryListScreen() {
                 placeholder="Все компании..."
               />
             </View>
-          </View>
+          </ScrollView>
         </BlurView>
 
         {loading ? (
@@ -277,13 +276,15 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: 8,
   },
-  filtersContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
+  filtersScroll: {
+    maxHeight: 50,
+  },
+  filtersScrollContent: {
+    gap: 8,
+    paddingRight: 16,
   },
   pickerWrapper: {
-    flex: 1,
+    width: 150,
   },
   listWrapper: {
     flex: 1,
