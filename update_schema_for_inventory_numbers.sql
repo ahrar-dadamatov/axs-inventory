@@ -5,6 +5,25 @@ ALTER TABLE branches ADD COLUMN IF NOT EXISTS code TEXT;
 UPDATE branches SET code = 'ALM' WHERE name = 'Алматы';
 UPDATE branches SET code = 'AST' WHERE name = 'Астана';
 UPDATE branches SET code = 'SHY' WHERE name = 'Шымкент';
+UPDATE branches SET code = 'AKB' WHERE name = 'Актобе';
+UPDATE branches SET code = 'KRG' WHERE name = 'Караганда';
+UPDATE branches SET code = 'TRZ' WHERE name = 'Тараз';
+UPDATE branches SET code = 'UKG' WHERE name = 'Усть-Каменогорск';
+UPDATE branches SET code = 'PVL' WHERE name = 'Павлодар';
+UPDATE branches SET code = 'ATR' WHERE name = 'Атырау';
+UPDATE branches SET code = 'SEM' WHERE name = 'Семей';
+UPDATE branches SET code = 'KZO' WHERE name = 'Кызылорда';
+UPDATE branches SET code = 'KSN' WHERE name = 'Костанай';
+UPDATE branches SET code = 'AKU' WHERE name = 'Актау';
+UPDATE branches SET code = 'URA' WHERE name = 'Уральск';
+UPDATE branches SET code = 'PTR' WHERE name = 'Петропавловск';
+UPDATE branches SET code = 'TUR' WHERE name = 'Туркестан';
+UPDATE branches SET code = 'KOK' WHERE name = 'Кокшетау';
+UPDATE branches SET code = 'TEM' WHERE name = 'Темиртау';
+UPDATE branches SET code = 'TDK' WHERE name = 'Талдыкорган';
+UPDATE branches SET code = 'EKI' WHERE name = 'Экибастуз';
+UPDATE branches SET code = 'RUD' WHERE name = 'Рудный';
+UPDATE branches SET code = 'ZHE' WHERE name = 'Жезказган';
 
 -- 2. Создаем таблицу companies
 CREATE TABLE IF NOT EXISTS companies (
@@ -35,7 +54,13 @@ INSERT INTO categories (name, code) VALUES
 ('Оргтехника', '03'),
 ('Бытовая техника', '04'),
 ('Инструменты', '05'),
-('Канцтовары', '06')
+('Канцтовары', '06'),
+('Сетевое оборудование', '07'),
+('Климатическое оборудование', '08'),
+('Посуда и кухонный инвентарь', '09'),
+('Освещение', '10'),
+('Транспорт и спецтехника', '11'),
+('Прочее', '12')
 ON CONFLICT (name) DO NOTHING;
 
 -- 4. Добавляем связи в inventory_items
