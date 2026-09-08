@@ -60,6 +60,7 @@ export default function AddItemScreen() {
 
   const [quantity, setQuantity] = useState('1');
   const [location, setLocation] = useState('');
+  const [notes, setNotes] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [image2, setImage2] = useState<string | null>(null);
@@ -243,6 +244,7 @@ export default function AddItemScreen() {
         name: finalName,
         quantity: parseInt(quantity, 10) || 1,
         usage_location: location,
+        notes: notes.trim() || null,
         image_url: imageUrl,
         image_url_2: imageUrl2,
         branch_id: selectedBranch,
@@ -362,6 +364,16 @@ export default function AddItemScreen() {
               placeholderTextColor="#64748b"
               value={location}
               onChangeText={setLocation}
+            />
+
+            <Text style={styles.label}>Примечание (Размеры, объем, модель...)</Text>
+            <TextInput
+              style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]}
+              placeholder="Например: Размер 120х60, или Кондиционер 12"
+              placeholderTextColor="#64748b"
+              value={notes}
+              onChangeText={setNotes}
+              multiline
             />
           </BlurView>
 

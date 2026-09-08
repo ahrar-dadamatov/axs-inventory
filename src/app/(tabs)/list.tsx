@@ -153,6 +153,11 @@ export default function InventoryListScreen() {
             <Text style={styles.itemDetail}>
               <Ionicons name="location" size={12} /> {item.usage_location || 'Локация не указана'}
             </Text>
+            {item.notes && (
+              <Text style={styles.notesText} numberOfLines={2}>
+                <Ionicons name="document-text" size={12} /> {item.notes}
+              </Text>
+            )}
           </View>
         </View>
       </BlurView>
@@ -396,6 +401,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#94a3b8',
     fontWeight: '500',
+  },
+  notesText: {
+    fontSize: 13,
+    color: '#fbbf24',
+    fontWeight: '500',
+    fontStyle: 'italic',
+    marginTop: 4,
   },
   center: {
     flex: 1,

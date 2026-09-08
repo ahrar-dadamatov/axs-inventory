@@ -114,6 +114,7 @@ export interface Database {
           category: string | null
           quantity: number
           usage_location: string | null
+          notes: string | null
           image_url: string | null
           image_url_2: string | null
           branch_id: string
@@ -130,6 +131,7 @@ export interface Database {
           category?: string | null
           quantity?: number
           usage_location?: string | null
+          notes?: string | null
           image_url?: string | null
           image_url_2?: string | null
           branch_id: string
@@ -146,6 +148,7 @@ export interface Database {
           category?: string | null
           quantity?: number
           usage_location?: string | null
+          notes?: string | null
           image_url?: string | null
           image_url_2?: string | null
           branch_id?: string
