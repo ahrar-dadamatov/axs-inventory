@@ -115,8 +115,13 @@ export default function AddItemScreen() {
     
     const { data: compData } = await supabase.from('companies').select('*');
     if (compData) {
-      setCompanies(compData);
-      if (compData.length > 0) setSelectedCompany(compData[0].id);
+      let allowedCompanies = compData;
+      if (profile?.role !== 'admin') {
+        const userCompanies = profile?.company ? profile.company.split(',').map(c => c.trim()) : [];
+        allowedCompanies = compData.filter(c => userCompanies.includes(c.name));
+      }
+      setCompanies(allowedCompanies);
+      if (allowedCompanies.length > 0) setSelectedCompany(allowedCompanies[0].id);
     }
     
     const { data: catData } = await supabase.from('categories').select('*');
